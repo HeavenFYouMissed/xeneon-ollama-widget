@@ -2,11 +2,11 @@
 
 Two custom AI chat widgets designed for the Corsair Xeneon Edge monitor display, connecting to your local Ollama instance.
 
-![Red Team Edition](images/redteam-main.png)
+![Red Team Edition](<img width="3397" height="1393" alt="Screenshot 2026-02-06 053710" src="https://github.com/user-attachments/assets/058d9e33-ea12-4a3f-8a1e-4febf85bef20" />)
 *Red Team Edition - Neon Cyberpunk Theme*
 
-![Xeneon Soft Edition](images/ollamasoft-main.png)
-*Xeneon Soft Edition - Clean Modern Interface*
+![Xeneon keyboard touch](<img width="3397" height="1393" alt="Screenshot 2026-02-06 053005" src="https://github.com/user-attachments/assets/5b16cdd7-f1e9-47e4-afbb-e0e8183595c1" />)
+*Xeneon*
 
 ## 🎨 Widgets
 
@@ -146,7 +146,7 @@ curl http://127.0.0.1:11434/api/tags
 
 Access settings via the ⚙️ button (bottom right):
 
-![Settings Panel](images/redteam-settings.png)
+![Settings Panel](<img width="3397" height="1382" alt="Screenshot 2026-02-06 053637" src="https://github.com/user-attachments/assets/eb4b2999-1ff9-433e-ab44-fca904cd054d" />)
 *Full Customization Settings Panel*
 
 **Background Tab:**
