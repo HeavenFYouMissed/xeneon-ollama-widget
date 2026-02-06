@@ -1,17 +1,17 @@
 # Ollama Corsair Xeneon Edge Widgets
 
-Two custom AI chat widgets designed for the Corsair Xeneon Edge monitor display, connecting to your local Ollama instance.
+custom AI chat widget designed for the Corsair Xeneon Edge monitor display, connecting to your local Ollama instance.
 
-![Red Team Edition]<img width="3397" height="1393" alt="Screenshot 2026-02-06 053710" src="https://github.com/user-attachments/assets/058d9e33-ea12-4a3f-8a1e-4febf85bef20" />
-*Red Team Edition - Neon Cyberpunk Theme*
+![Dark Edition]<img width="3397" height="1393" alt="Screenshot 2026-02-06 053710" src="https://github.com/user-attachments/assets/058d9e33-ea12-4a3f-8a1e-4febf85bef20" />
+*Red Team Edition - dark Theme customizable by code/background*
 
 ![Xeneon keyboard touch]<img width="3397" height="1393" alt="Screenshot 2026-02-06 053005" src="https://github.com/user-attachments/assets/5b16cdd7-f1e9-47e4-afbb-e0e8183595c1" />
 *Xeneon*
 
 ## 🎨 Widgets
 
-### 1. **Red Team Edition** (`redteam.html`)
-- 🔥 Ultra-customizable neon cyberpunk theme
+### 1. **Dark Edition** (`redteam.html`)
+- 🔥 Ultra-customizable Dark Edition theme
 - ⚙️ Full glass morphism controls
 - 🎨 Custom color schemes
 - 🖼️ Custom backgrounds and logos
@@ -135,7 +135,7 @@ curl http://127.0.0.1:11434/api/tags
 
 ## ⚙️ Configuration
 
-### Red Team Widget Settings
+### Dark Edition Widget Settings
 
 Access settings via the ⚙️ button (bottom right):
 
@@ -329,8 +329,7 @@ journalctl -u ollama -f
 
 ## 📱 Features
 
-### Red Team Edition
-- ✨ Glass morphism effects
+### Dark Edition
 - 🎨 Full theme customization
 - ⌨️ Touch-friendly virtual keyboard
 - 🎭 AI personality presets
