@@ -19,13 +19,6 @@ Two custom AI chat widgets designed for the Corsair Xeneon Edge monitor display,
 - 🎭 Multiple AI personality presets
 - 💾 All settings persist via localStorage
 
-### 2. **Xeneon Soft Edition** (`ollamasoft.html`)
-- 🎯 Clean, modern gradient design
-- 📱 Mobile-optimized and touch-friendly
-- 💬 Chat history persistence
-- ⚡ Fast and lightweight
-- 🔄 Auto-reconnect functionality
-
 ## 📋 Requirements
 
 - **Ollama** - [Download here](https://ollama.com)
@@ -162,12 +155,6 @@ Access settings via the ⚙️ button (bottom right):
 - Change font family and size
 - Pick from color picker or enter hex codes
 
-**Glass Tab:**
-- Blur intensity (0-20px)
-- Background overlay darkness
-- Background brightness
-- UI opacity control
-
 **Logo Tab:**
 - Add custom header logo
 - Supports URL or file upload
@@ -180,7 +167,7 @@ Access settings via the ⚙️ button (bottom right):
   - 📖 Storyteller
   - ⚡ Direct Mode
 
-### Both Widgets
+### Widgets
 
 - **Model Selection:** Top-right dropdown
 - **Clear Chat:** Button in header
@@ -350,14 +337,6 @@ journalctl -u ollama -f
 - 💾 Persistent settings
 - 🖼️ Custom backgrounds
 - 🔤 ASCII art headers
-
-### Xeneon Soft Edition
-- 📝 Chat history persistence
-- 🎯 Clean modern UI
-- 📱 Mobile optimized
-- ⚡ Lightweight
-- 🔄 Auto-reconnect
-- ✨ Smooth animations
 
 ## 🤝 Contributing
 
