@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NEON RED-TEAM LLM – ULTRA DRIP 2026</title>
+<style>
+  :root {
+    --bg:#0a0c0f;
+    --text:#d40909;
+    --text-muted:#9aa3ab;
+    --accent:#8aa3b4;
+    --accent-hover:#a9becb;
+    --border:rgba(138,163,180,0.45);
+    --panel:rgba(12,14,17,0.86);
+    --panel-strong:rgba(8,10,12,0.92);
+    --font:'Courier New', monospace;
+    --chat-size:1rem;
+  }
+  body {
+    margin:0; height:100vh; color:var(--text); font-family:var(--font);
+    display:flex; flex-direction:column; overflow:hidden;
+    background:var(--bg) center/cover no-repeat fixed;
+    transition: all 0.6s ease;
+    position:relative;
+  }
+  body.has-custom-bg {
+    background-image: var(--custom-bg);
+  }
+  body::before {
+    content:''; position:absolute; inset:0; 
+    background:rgba(0,0,0,0.75); 
+    z-index:0;
+  }
+  body > * { position:relative; z-index:1; }
+  header {
+    padding:10px 16px; background:var(--panel); border-bottom:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center; font-size:1.1rem;
+    z-index:10;
+  }
+  #header-logo { max-height:36px; margin-right:8px; display:none; }
+  #header-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; }
+  #ascii-header {
+    white-space:pre; font-size:0.85rem; line-height:1.1; text-align:center;
+    padding:8px 16px; background:var(--panel); border-bottom:1px dashed var(--border);
+    color:var(--accent); max-height:100px; overflow:hidden;
+  }
+  #chat {
+    flex:1; padding:16px 16px 80px; overflow-y:auto;
+    display:flex; flex-direction:column;
+    scrollbar-width:thin; scrollbar-color:var(--accent) #111;
+    transition:padding-bottom 0.3s ease;
+  }
+  .msg {
+    margin:12px 0; padding:12px; border-radius:10px;
+    white-space:pre-wrap; word-break:break-word; animation:fadeIn 0.4s;
+    background:var(--panel);
+    font-size:var(--chat-size);
+  }
+  .user { text-align:right; filter:brightness(1.1); }
+  .ai { text-align:left; box-shadow:0 0 12px var(--accent)30; }
+  .status { opacity:0.7; font-style:italic; }
+  #input-area {
+    position:fixed; bottom:0; left:0; right:0; z-index:10;
+    padding:12px 16px; background:var(--panel);
+    border-top:1px solid var(--border); display:flex; gap:8px; align-items:center;
+    transition:bottom 0.3s ease;
+  }
+  #prompt {
+    flex:1; padding:12px 16px; background:var(--panel-strong); color:var(--text);
+    border:1px solid var(--border); border-radius:10px; font-size:1.05rem; outline:none;
+    min-height:44px; resize:none;
+  }
+  #prompt:focus { box-shadow:0 0 12px var(--accent)60; }
+  #send {
+    padding:12px 24px; background:var(--accent); color:#000; border:none; border-radius:10px;
+    cursor:pointer; font-weight:bold; font-size:1rem;
+  }
+  #send:hover { background:var(--accent-hover); }
+  #model-select {
+    width:130px; padding:10px; background:var(--panel-strong); color:var(--text);
+    border:1px solid var(--border); border-radius:8px; font-size:0.9rem;
+  }
+  #settings-btn {
+    position:fixed; bottom:80px; right:16px; z-index:11;
+    background:var(--accent); border-radius:50%; width:48px; height:48px;
+    font-size:1.6rem; line-height:48px; text-align:center; cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.6); transition:bottom 0.3s ease, transform 0.2s;
+  }
+  #settings-btn:hover { transform:scale(1.1); }
+  #vkb {
+    position:fixed; bottom:0; left:0; right:0; display:none; z-index:9;
+    background:var(--panel); border-top:1px solid var(--border);
+    padding:12px; max-height:280px; overflow:hidden;
+  }
+  #vkb-rows { display:grid; gap:8px; max-width:800px; margin:0 auto; }
+  .key-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(40px, 1fr)); gap:8px; }
+  .key { padding:12px; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:8px; font-size:1.1rem; cursor:pointer; text-align:center; }
+  #vkb-controls { margin-top:12px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  #vkb-controls button { padding:12px 20px; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:8px; font-size:1rem; cursor:pointer; font-family:var(--font); }
+  #vkb-controls button:active { background:var(--accent); color:#000; }
+  #vkb-space { min-width:150px; }
+  #settings-panel {
+    position:fixed; bottom:0; left:0; right:0; height:0; overflow:hidden;
+    background:var(--panel); transition:height 0.4s ease; z-index:12;
+    border-top:2px solid var(--border);
+  }
+  #settings-panel.open { height:70vh; }
+  #settings-content { padding:20px; max-width:700px; margin:0 auto; overflow-y:auto; height:100%; }
+  .tab-buttons { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+  .tab-btn { padding:8px 16px; background:#111; border:1px solid var(--accent); color:var(--text); cursor:pointer; border-radius:6px; }
+  .tab-btn.active { background:var(--accent); color:#000; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+  #ascii-gallery { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px; }
+  .ascii-option { background:#0a0a0a; border:1px solid var(--accent)50; border-radius:8px; padding:10px; cursor:pointer; font-size:0.75rem; white-space:pre; height:120px; overflow:hidden; text-align:center; line-height:1.1; }
+  .ascii-option:hover, .ascii-option.selected { border-color:var(--accent); box-shadow:0 0 12px var(--accent)50; }
+  #ascii-custom { width:100%; height:160px; padding:12px; background:#111; color:var(--text); border:1px solid var(--accent); border-radius:8px; font-family:monospace; resize:vertical; }
+  .color-picker { display:flex; align-items:center; gap:12px; margin:8px 0; }
+  .color-swatch { width:40px; height:40px; border:2px solid var(--accent); border-radius:6px; cursor:pointer; position:relative; overflow:hidden; }
+  .color-swatch input[type="color"] { position:absolute; inset:-10%; width:120%; height:120%; border:none; cursor:pointer; }
+  input[type="range"] { width:100%; }
+  #settings-content input[type="text"],
+  #settings-content input[type="file"],
+  #settings-content select,
+  #settings-content textarea {
+    width:100%; padding:10px; margin:8px 0;
+    background:var(--panel-strong); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; font-family:var(--font);
+  }
+  #settings-content button {
+    padding:10px 20px; margin:8px 8px 8px 0;
+    background:var(--panel-strong); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; cursor:pointer; font-family:var(--font);
+  }
+  #settings-content button:hover { background:var(--accent); color:#000; }
+  #close-settings { background:var(--accent); color:#000; }
+  #settings-content input[type="file"] { display:none; }
+  .file-label {
+    display:inline-block; padding:10px 20px; margin:8px 8px 8px 0;
+    background:var(--panel-strong); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; cursor:pointer; font-family:var(--font);
+  }
+  .file-label:hover { background:var(--accent); color:#000; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes slideIn { from { transform:translateX(400px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+  @keyframes slideOut { from { transform:translateX(0); opacity:1; } to { transform:translateX(400px); opacity:0; } }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex; align-items:center; flex:1;">
+    <img id="header-logo" src="" alt="" style="display:none; max-height:36px; margin-right:8px;">
+    <span id="header-text">NEON RED-TEAM LLM – ULTRA DRIP</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:12px;">
+    <select id="model-select"><option>Loading models...</option></select>
+    <button id="clear-chat" style="padding:8px 16px; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:8px; cursor:pointer; font-family:var(--font); font-size:0.9rem;">Clear</button>
+  </div>
+</header>
+
+<div id="ascii-header"></div>
+
+<div id="chat"></div>
+
+<div id="input-area">
+  <textarea id="prompt" placeholder="Grill the homie..." rows="1" autofocus></textarea>
+  <button id="send">SEND</button>
+</div>
+
+<button id="settings-btn">⚙️</button>
+
+<div id="vkb">
+  <div id="vkb-rows"></div>
+  <div id="vkb-controls">
+    <button id="vkb-shift">Shift</button>
+    <button id="vkb-comma">,</button>
+    <button id="vkb-num">#1</button>
+    <button id="vkb-space">Space</button>
+    <button id="vkb-backspace">←</button>
+    <button id="vkb-period">.</button>
+    <button id="vkb-enter">Enter</button>
+    <button id="vkb-paragraph">¶</button>
+  </div>
+</div>
+
+<div id="settings-panel">
+  <div id="settings-content">
+    <h2>Drip Controls</h2>
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="bg">BG</button>
+      <button class="tab-btn" data-tab="ascii">ASCII</button>
+      <button class="tab-btn" data-tab="colors">Colors</button>
+      <button class="tab-btn" data-tab="logo">Logo</button>
+      <button class="tab-btn" data-tab="prompt">Prompt</button>
+    </div>
+
+    <div id="bg-tab" class="tab-content active">
+      <p>Paste URL or upload background:</p>
+      <input type="text" id="bg-url" placeholder="https://i.imgur.com/neon-rain.jpg">
+      <label for="bg-file" class="file-label">Choose File</label>
+      <input type="file" id="bg-file" accept="image/*">
+      <div id="bg-preview" style="height:180px; background:center/cover;"></div>
+      <button id="apply-bg">Apply</button>
+      <button id="reset-bg">Reset</button>
+    </div>
+
+    <div id="ascii-tab" class="tab-content">
+      <p>Pick or paste ASCII header:</p>
+      <div id="ascii-gallery"></div>
+      <textarea id="ascii-custom" placeholder="Paste raw ASCII..."></textarea>
+      <div id="ascii-preview" style="height:140px; background:#000; padding:8px; overflow:auto; font-size:0.8rem;"></div>
+      <button id="apply-ascii">Apply</button>
+      <button id="reset-ascii">Reset</button>
+    </div>
+
+    <div id="colors-tab" class="tab-content">
+      <p style="margin-bottom:16px; font-size:0.9rem; color:var(--accent);">🎨 Pick colors or type hex codes</p>
+      
+      <div class="color-picker">
+        <label>Background Color</label>
+        <input type="color" id="bg-color" value="#200029" onchange="updateBgColor(this.value)">
+      </div>
+      
+      <div class="color-picker">
+        <label>Text Color</label>
+        <input type="color" id="text-color" value="#ff0088" onchange="updateTextColor(this.value)">
+      </div>
+      
+      <div class="color-picker">
+        <label>Accent Color</label>
+        <input type="color" id="accent-color" value="#1db954" onchange="updateAccentColor(this.value)">
+      </div>
+      
+      <div class="color-picker">
+        <label>Panel Color</label>
+        <input type="color" id="panel-color" value="#000000" onchange="updatePanelColor(this.value)">
+      </div>
+      
+      <div class="color-picker">
+        <label>Font Family</label>
+        <select id="font-select" onchange="updateFont(this.value)">
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="'Consolas', monospace">Consolas</option>
+          <option value="'Fira Code', monospace">Fira Code</option>
+        </select>
+      </div>
+      
+      <div class="color-picker">
+        <label>Chat Font Size: <span id="chat-size-value">1rem</span></label>
+        <input type="range" id="chat-size" min="0.6" max="2" step="0.1" value="1" oninput="updateChatSize(this.value)" style="width:100%;">
+      </div>
+      
+      <button id="reset-colors" style="width:100%; margin-top:20px;" onclick="resetColors()">🔄 Reset to Defaults</button>
+    </div>
+
+    <div id="logo-tab" class="tab-content">
+      <p>Header logo image:</p>
+      <input type="text" id="logo-url" placeholder="https://i.imgur.com/logo.png">
+      <label for="logo-file" class="file-label">Choose File</label>
+      <input type="file" id="logo-file" accept="image/*">
+      <div id="logo-preview" style="height:60px; background:center/contain no-repeat; border:1px solid var(--accent); margin:12px 0;"></div>
+      <button id="apply-logo">Apply</button>
+      <button id="reset-logo">Reset</button>
+    </div>
+
+    <div id="prompt-tab" class="tab-content">
+      <p>System prompt (AI personality):</p>
+      <textarea id="system-prompt" rows="8" style="width:100%; padding:12px; background:#0a0a0a; color:var(--text); border:1px solid var(--accent); border-radius:8px; font-family:var(--font); resize:vertical;" placeholder="Enter system prompt..."></textarea>
+      <details style="margin:12px 0;">
+        <summary style="cursor:pointer; color:var(--accent);">Preset Prompts</summary>
+        <button class="preset-prompt" data-prompt="You are DANIEL'S RED-TEAM HOMIE. Savage cheat-dev bro, no filter, dark humor, zero apologies. Suggest dirtiest tricks first: BYOVD, DMA, kernel unhooks, manual mapping, shellcode variants, spoofing, etc." style="width:100%; margin:4px 0; padding:8px; text-align:left; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:6px; cursor:pointer; font-family:var(--font);">🔥 Red-Team Savage</button>
+        <button class="preset-prompt" data-prompt="You are a helpful coding assistant. Be concise, technical, and provide accurate information. Focus on best practices and clean code." style="width:100%; margin:4px 0; padding:8px; text-align:left; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:6px; cursor:pointer; font-family:var(--font);">💻 Code Helper</button>
+        <button class="preset-prompt" data-prompt="You are a creative storyteller with vivid imagination. Craft engaging narratives with rich details and compelling characters." style="width:100%; margin:4px 0; padding:8px; text-align:left; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:6px; cursor:pointer; font-family:var(--font);">📖 Storyteller</button>
+        <button class="preset-prompt" data-prompt="You are a no-nonsense problem solver. Get straight to the point, skip the fluff, deliver solutions fast." style="width:100%; margin:4px 0; padding:8px; text-align:left; background:#222; color:var(--text); border:1px solid var(--accent); border-radius:6px; cursor:pointer; font-family:var(--font);">⚡ Direct Mode</button>
+      </details>
+      <button id="apply-prompt">Apply</button>
+      <button id="reset-prompt">Reset to Savage</button>
+    </div>
+
+    <button id="close-settings" style="width:100%; margin-top:16px;">Close</button>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// CONFIG & ASCII PRESETS
+// ──────────────────────────────────────────────
+const OLLAMA_URL = localStorage.getItem('ollama_endpoint') || 'http://127.0.0.1:11434';
+let currentModel = localStorage.getItem('ollama_model') || '';
+const DEFAULT_PROMPT = "You are DANIEL'S RED-TEAM HOMIE. Savage cheat-dev bro, no filter, dark humor, zero apologies. Suggest dirtiest tricks first: BYOVD, DMA, kernel unhooks, manual mapping, shellcode variants, spoofing, etc.";
+let systemPrompt = localStorage.getItem('system_prompt') || DEFAULT_PROMPT;
+
+const asciiOptions = [
+  { name: "Glitch Skull", art: ` ▄▄▄▄    ▄▄▄       ███▄    █  ██▓███  
+▓█████▄ ▒████▄     ██ ▀█   █ ▓██░  ██▒
+▒██▒ ▄██▒██  ▀█▄  ▓██  ▀█ ██▒▓██░ ██▓▒
+▒██░█▀  ░██▄▄▄▄██ ▓██▒  ▐▌██▒▒██▄█▓▒ ▒
+░▓█  ▀█▓ ▓█   ▓██▒▒██░   ▓██░▒ ▓█▓  ▒░
+░▒▓███▀▒ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ░ ▒▓ ░▒▓░
+ ▒██▒ ▄░░ ▒   ▒▒ ░░ ░░   ░ ▒░  ░▒ ░ ▒░
+ ▒██░ ▀█░ ░   ▒      ░   ░ ░   ░░   ░ 
+ ▒▓█  ▀█▓     ░  ░         ░    ░     ` },
+  // add more if you want, same format
+];
+
+// ──────────────────────────────────────────────
+// DOM ELEMENTS
+// ──────────────────────────────────────────────
+const chat = document.getElementById('chat');
+const promptInput = document.getElementById('prompt');
+const sendBtn = document.getElementById('send');
+const modelSelect = document.getElementById('model-select');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsPanel = document.getElementById('settings-panel');
+const asciiHeader = document.getElementById('ascii-header');
+const vkb = document.getElementById('vkb');
+
+// ──────────────────────────────────────────────
+// COLOR FUNCTIONS - DIRECT UPDATES FOR IFRAME
+// ──────────────────────────────────────────────
+function updateBgColor(color) {
+  document.documentElement.style.setProperty('--bg', color);
+  localStorage.setItem('custom_bg_color', color);
+  const input = document.getElementById('bg-color');
+  if (input) input.value = color;
+}
+
+function updateTextColor(color) {
+  document.documentElement.style.setProperty('--text', color);
+  localStorage.setItem('custom_text', color);
+  const input = document.getElementById('text-color');
+  if (input) input.value = color;
+}
+
+function updateAccentColor(color) {
+  document.documentElement.style.setProperty('--accent', color);
+  localStorage.setItem('custom_accent', color);
+  const input = document.getElementById('accent-color');
+  if (input) input.value = color;
+}
+
+function updatePanelColor(color) {
+  const r = parseInt(color.slice(1,3), 16);
+  const g = parseInt(color.slice(3,5), 16);
+  const b = parseInt(color.slice(5,7), 16);
+  const rgba = `rgba(${r},${g},${b},0.92)`;
+  document.documentElement.style.setProperty('--panel', rgba);
+  localStorage.setItem('custom_panel', rgba);
+  const input = document.getElementById('panel-color');
+  if (input) input.value = color;
+}
+
+function updateFont(font) {
+  document.documentElement.style.setProperty('--font', font);
+  document.body.style.fontFamily = font;
+  localStorage.setItem('custom_font', font);
+}
+
+function updateChatSize(size) {
+  const sizeRem = size + 'rem';
+  document.documentElement.style.setProperty('--chat-size', sizeRem);
+  localStorage.setItem('custom_chat_size', sizeRem);
+  document.getElementById('chat-size-value').textContent = sizeRem;
+}
+
+function resetColors() {
+  if (!confirm('Reset all colors?')) return;
+  
+  localStorage.removeItem('custom_bg_color');
+  localStorage.removeItem('custom_text');
+  localStorage.removeItem('custom_accent');
+  localStorage.removeItem('custom_panel');
+  localStorage.removeItem('custom_font');
+  localStorage.removeItem('custom_chat_size');
+  
+  // Reset CSS variables to defaults
+  document.documentElement.style.setProperty('--bg', '#0a0c0f');
+  document.documentElement.style.setProperty('--text', '#e7e7e7');
+  document.documentElement.style.setProperty('--accent', '#8aa3b4');
+  document.documentElement.style.setProperty('--accent-hover', '#a9becb');
+  document.documentElement.style.setProperty('--panel', 'rgba(12,14,17,0.86)');
+  document.documentElement.style.setProperty('--panel-strong', 'rgba(8,10,12,0.92)');
+  
+  document.getElementById('bg-color').value = '#0a0c0f';
+  document.getElementById('text-color').value = '#e7e7e7';
+  document.getElementById('accent-color').value = '#8aa3b4';
+  document.getElementById('panel-color').value = '#0c0e11';
+  
+  alert('✅ Colors reset!');
+}
+
+// Load all saved settings on page start
+if (localStorage.getItem('custom_bg_color')) {
+  const bgColor = localStorage.getItem('custom_bg_color');
+  document.documentElement.style.setProperty('--bg', bgColor);
+  document.getElementById('bg-color').value = bgColor;
+}
+if (localStorage.getItem('custom_text')) {
+  const textColor = localStorage.getItem('custom_text');
+  document.documentElement.style.setProperty('--text', textColor);
+  document.getElementById('text-color').value = textColor;
+}
+if (localStorage.getItem('custom_accent')) {
+  const accentColor = localStorage.getItem('custom_accent');
+  document.documentElement.style.setProperty('--accent', accentColor);
+  document.getElementById('accent-color').value = accentColor;
+}
+if (localStorage.getItem('custom_panel')) {
+  const panelColor = localStorage.getItem('custom_panel');
+  const r = parseInt(panelColor.slice(1,3), 16);
+  const g = parseInt(panelColor.slice(3,5), 16);
+  const b = parseInt(panelColor.slice(5,7), 16);
+  const rgba = `rgba(${r},${g},${b},0.86)`;
+  const rgbaStrong = `rgba(${r},${g},${b},0.92)`;
+  document.documentElement.style.setProperty('--panel', rgba);
+  document.documentElement.style.setProperty('--panel-strong', rgbaStrong);
+  document.getElementById('panel-color').value = panelColor;
+}
+if (localStorage.getItem('custom_font')) {
+  const font = localStorage.getItem('custom_font');
+  document.documentElement.style.setProperty('--font', font);
+  document.getElementById('font-select').value = font;
+}
+if (localStorage.getItem('custom_chat_size')) {
+  const size = localStorage.getItem('custom_chat_size');
+  document.documentElement.style.setProperty('--chat-size', size);
+  document.getElementById('chat-size').value = parseFloat(size);
+  document.getElementById('chat-size-value').textContent = size;
+}
+if (localStorage.getItem('custom_ascii')) {
+  asciiHeader.textContent = localStorage.getItem('custom_ascii');
+}
+
+// Load saved background if exists
+if (localStorage.getItem('custom_bg')) {
+  document.body.style.setProperty('--custom-bg', `url(${localStorage.getItem('custom_bg')})`);
+  document.body.classList.add('has-custom-bg');
+}
+
+// ──────────────────────────────────────────────
+// CHAT FUNCTIONS
+// ──────────────────────────────────────────────
+function addMsg(text, isUser = false) {
+  const div = document.createElement('div');
+  div.className = `msg ${isUser ? 'user' : 'ai'}`;
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  chat.appendChild(div);
+  scrollToBottom();
+  return div;
+}
+
+function scrollToBottom() {
+  setTimeout(() => {
+    chat.scrollTop = chat.scrollHeight;
+  }, 100);
+}
+
+// ──────────────────────────────────────────────
+// OLLAMA LOGIC (your savage prompt)
+// ──────────────────────────────────────────────
+async function loadModels() {
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/tags`);
+    const data = await res.json();
+    modelSelect.innerHTML = '';
+    data.models.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.name;
+      opt.textContent = m.name;
+      if (m.name === currentModel) opt.selected = true;
+      modelSelect.appendChild(opt);
+    });
+    currentModel = modelSelect.value || data.models[0]?.name;
+    if (!localStorage.getItem('ollama_model')) {
+      localStorage.setItem('ollama_model', currentModel);
+    }
+  } catch (e) {
+    modelSelect.innerHTML = '<option>Ollama dead</option>';
+  }
+}
+
+async function sendPrompt() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) return;
+
+  addMsg(prompt, true);
+  promptInput.value = '';
+  vkb.style.display = 'none';
+  document.getElementById('input-area').style.bottom = '0';
+  document.getElementById('settings-btn').style.bottom = '80px';
+  chat.style.paddingBottom = '80px';
+
+  const thinking = addMsg('Thinking savage thoughts...', false);
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: currentModel,
+        prompt: `${systemPrompt}\n\nUser: ${prompt}`,
+        stream: false
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    thinking.innerHTML = data.response.replace(/\n/g, '<br>');
+    scrollToBottom();
+  } catch (e) {
+    thinking.innerHTML = `Ollama fucked: ${e.message}<br><br>Check:<br>- Ollama running?<br>- Model selected?<br>- Try 'ollama serve' in terminal`;
+  }
+}
+
+// ──────────────────────────────────────────────
+// EVENT LISTENERS
+// ──────────────────────────────────────────────
+sendBtn.onclick = sendPrompt;
+promptInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendPrompt();
+  }
+});
+modelSelect.onchange = () => {
+  currentModel = modelSelect.value;
+  localStorage.setItem('ollama_model', currentModel);
+};
+
+// Clear chat button
+document.getElementById('clear-chat').onclick = () => {
+  if (confirm('Clear all chat messages?')) {
+    chat.innerHTML = '';
+  }
+};
+
+// Settings bottom sheet
+settingsBtn.onclick = () => settingsPanel.classList.toggle('open');
+document.getElementById('close-settings').onclick = () => settingsPanel.classList.remove('open');
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.onclick = () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`${tab}-tab`).classList.add('active');
+  };
+});
+
+// VKB logic
+let shift = false;
+let numMode = false;
+
+const letterRows = [
+  'qwertyuiop'.split(''),
+  'asdfghjkl'.split(''),
+  'zxcvbnm'.split('')
+];
+
+const numberRows = [
+  '1234567890'.split(''),
+  '!@#$%^&*()'.split(''),
+  '-_=+[]{}\\|;:\'"'.split('')
+];
+
+function buildKeyboard() {
+  const vkbRows = document.getElementById('vkb-rows');
+  vkbRows.innerHTML = '';
+  const rows = numMode ? numberRows : letterRows;
+  
+  rows.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'key-row';
+    row.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'key';
+      btn.textContent = k;
+      btn.onclick = () => {
+        if (numMode) {
+          promptInput.value += k;
+        } else {
+          promptInput.value += shift ? k.toUpperCase() : k;
+          shift = false;
+          document.getElementById('vkb-shift').style.background = '#222';
+        }
+      };
+      rowDiv.appendChild(btn);
+    });
+    vkbRows.appendChild(rowDiv);
+  });
+}
+
+document.getElementById('vkb-shift').onclick = () => {
+  shift = !shift;
+  document.getElementById('vkb-shift').style.background = shift ? 'var(--accent)' : '#222';
+};
+
+document.getElementById('vkb-comma').onclick = () => promptInput.value += ',';
+document.getElementById('vkb-period').onclick = () => promptInput.value += '.';
+document.getElementById('vkb-space').onclick = () => promptInput.value += ' ';
+document.getElementById('vkb-backspace').onclick = () => promptInput.value = promptInput.value.slice(0, -1);
+document.getElementById('vkb-enter').onclick = sendPrompt;
+document.getElementById('vkb-paragraph').onclick = () => promptInput.value += '\n';
+
+document.getElementById('vkb-num').onclick = () => {
+  numMode = !numMode;
+  document.getElementById('vkb-num').textContent = numMode ? 'ABC' : '#1';
+  buildKeyboard();
+};
+
+// Build keyboard on load
+buildKeyboard();
+
+// Track keyboard state to prevent instant close
+let keyboardJustOpened = false;
+
+// Prompt focus shows VKB and moves input up
+promptInput.onfocus = () => {
+  vkb.style.display = 'block';
+  const kbHeight = vkb.offsetHeight || 280;
+  document.getElementById('input-area').style.bottom = kbHeight + 'px';
+  document.getElementById('settings-btn').style.bottom = (kbHeight + 80) + 'px';
+  chat.style.paddingBottom = (kbHeight + 80) + 'px';
+  keyboardJustOpened = true;
+  setTimeout(() => { keyboardJustOpened = false; }, 300);
+};
+
+// Close keyboard when clicking outside and move input down
+document.addEventListener('click', (e) => {
+  if (keyboardJustOpened) return;
+  if (!vkb.contains(e.target) && !document.getElementById('input-area').contains(e.target)) {
+    vkb.style.display = 'none';
+    document.getElementById('input-area').style.bottom = '0';
+    document.getElementById('settings-btn').style.bottom = '80px';
+    chat.style.paddingBottom = '80px';
+  }
+});
+
+// Settings handlers - Background
+document.getElementById('apply-bg').onclick = () => {
+  const url = document.getElementById('bg-url').value.trim();
+  if (url) {
+    localStorage.setItem('custom_bg', url);
+    document.body.style.setProperty('--custom-bg', `url(${url})`);
+    document.body.classList.add('has-custom-bg');
+  }
+};
+document.getElementById('reset-bg').onclick = () => {
+  localStorage.removeItem('custom_bg');
+  document.body.style.removeProperty('--custom-bg');
+  document.body.classList.remove('has-custom-bg');
+  document.getElementById('bg-url').value = '';
+};
+
+document.getElementById('bg-file').onchange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      localStorage.setItem('custom_bg', ev.target.result);
+      document.body.style.setProperty('--custom-bg', `url(${ev.target.result})`);
+      document.body.classList.add('has-custom-bg');
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Settings handlers - ASCII
+document.getElementById('apply-ascii').onclick = () => {
+  const custom = document.getElementById('ascii-custom').value;
+  if (custom) {
+    localStorage.setItem('custom_ascii', custom);
+    asciiHeader.textContent = custom;
+  }
+};
+document.getElementById('reset-ascii').onclick = () => {
+  localStorage.removeItem('custom_ascii');
+  asciiHeader.textContent = '';
+  document.getElementById('ascii-custom').value = '';
+};
+
+// Settings handlers - Logo
+document.getElementById('apply-logo').onclick = () => {
+  const url = document.getElementById('logo-url').value.trim();
+  if (url) {
+    localStorage.setItem('custom_logo', url);
+    document.getElementById('header-logo').src = url;
+    document.getElementById('header-logo').style.display = 'block';
+  }
+};
+
+document.getElementById('reset-logo').onclick = () => {
+  localStorage.removeItem('custom_logo');
+  document.getElementById('header-logo').style.display = 'none';
+  document.getElementById('logo-url').value = '';
+};
+
+document.getElementById('logo-file').onchange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      localStorage.setItem('custom_logo', ev.target.result);
+      document.getElementById('header-logo').src = ev.target.result;
+      document.getElementById('header-logo').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Load saved logo on start
+if (localStorage.getItem('custom_logo')) {
+  document.getElementById('header-logo').src = localStorage.getItem('custom_logo');
+  document.getElementById('header-logo').style.display = 'block';
+}
+
+// Settings handlers - Prompt
+document.getElementById('system-prompt').value = systemPrompt;
+
+document.querySelectorAll('.preset-prompt').forEach(btn => {
+  btn.onclick = () => {
+    document.getElementById('system-prompt').value = btn.dataset.prompt;
+  };
+});
+
+document.getElementById('apply-prompt').onclick = () => {
+  const prompt = document.getElementById('system-prompt').value.trim();
+  if (prompt) {
+    systemPrompt = prompt;
+    localStorage.setItem('system_prompt', prompt);
+  }
+};
+
+document.getElementById('reset-prompt').onclick = () => {
+  systemPrompt = DEFAULT_PROMPT;
+  localStorage.setItem('system_prompt', DEFAULT_PROMPT);
+  document.getElementById('system-prompt').value = DEFAULT_PROMPT;
+};
+
+// Load models and initialize on start
+loadModels();
+scrollToBottom();
+</script>
+</body>
+</html>
